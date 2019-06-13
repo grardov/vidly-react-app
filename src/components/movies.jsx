@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { getMovies, deleteMovie } from "../services/movieService";
 import { getGenres } from "../services/genreService";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import Pagination from "./common/pagination";
 import ListGroup from "./common/listGroup";
 import MoviesTable from "./moviesTable";
@@ -35,7 +35,7 @@ class Movies extends Component {
 
   handleSearch = query => {
     this.setState({ searchQuery: query, selectedGenre: null, currentPage: 1 });
-  }
+  };
 
   handleDelete = async movie => {
     const originalMovies = this.state.movies;
@@ -47,7 +47,7 @@ class Movies extends Component {
     } catch (error) {
       if (error.response && error.response.status === "404")
         toast.error("This movie has already been deleted.");
-      
+
       this.setState({ movies: originalMovies });
     }
   };
@@ -65,7 +65,7 @@ class Movies extends Component {
   };
 
   handleSort = sortColumn => {
-    this.setState({ sortColumn })
+    this.setState({ sortColumn });
   };
 
   getPagedData = () => {
@@ -80,22 +80,23 @@ class Movies extends Component {
 
     let filtered = allMovies;
     if (searchQuery)
-      filtered = allMovies.filter(m => 
+      filtered = allMovies.filter(m =>
         m.title.toLowerCase().startsWith(searchQuery.toLowerCase())
       );
-    else if(selectedGenre && selectedGenre._id)
+    else if (selectedGenre && selectedGenre._id)
       filtered = allMovies.filter(m => m.genre._id === selectedGenre._id);
 
     const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
 
     const movies = paginate(sorted, currentPage, pageSize);
 
-    return { totalCount: filtered.length, data: movies }
-  }
+    return { totalCount: filtered.length, data: movies };
+  };
 
   render() {
     const { pageSize, currentPage, sortColumn, searchQuery } = this.state;
     const { length: count } = this.state.movies;
+    const { user } = this.props;
 
     if (count === 0) return <p>There are no movies in the database.</p>;
 
@@ -111,15 +112,17 @@ class Movies extends Component {
           />
         </div>
         <div className="col">
-          <Link
-            to="movies/new"
-            className="btn btn-primary btn-small"
-            style={{ marginBottom: 20 }}
-          >
-          New Movie
-          </Link>
+          {user && (
+            <Link
+              to="movies/new"
+              className="btn btn-primary btn-small"
+              style={{ marginBottom: 20 }}
+            >
+              New Movie
+            </Link>
+          )}
           <p>Showing {totalCount} movies in the databse.</p>
-          <SearchBox value={searchQuery} onChange={this.handleSearch}/>
+          <SearchBox value={searchQuery} onChange={this.handleSearch} />
           <MoviesTable
             movies={movies}
             sortColumn={sortColumn}
