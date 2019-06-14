@@ -9,6 +9,7 @@ import { paginate } from "../utils/paginate";
 import _ from "lodash";
 import { Link } from "react-router-dom";
 import SearchBox from "./common/searchBox";
+import AuthContextConsumer from "./context/authContext";
 
 class Movies extends Component {
   state = {
@@ -96,7 +97,6 @@ class Movies extends Component {
   render() {
     const { pageSize, currentPage, sortColumn, searchQuery } = this.state;
     const { length: count } = this.state.movies;
-    const { user } = this.props;
 
     if (count === 0) return <p>There are no movies in the database.</p>;
 
@@ -111,33 +111,37 @@ class Movies extends Component {
             onItemSelect={this.handleGenreSelect}
           />
         </div>
-        <div className="col">
-          {user && (
-            <Link
-              to="movies/new"
-              className="btn btn-primary btn-small"
-              style={{ marginBottom: 20 }}
-            >
-              New Movie
-            </Link>
+        <AuthContextConsumer>
+          {({ user }) => (
+            <div className="col">
+              {user && (
+                <Link
+                  to="movies/new"
+                  className="btn btn-primary btn-small"
+                  style={{ marginBottom: 20 }}
+                >
+                  New Movie
+                </Link>
+              )}
+              <p>Showing {totalCount} movies in the databse.</p>
+              <SearchBox value={searchQuery} onChange={this.handleSearch} />
+              <MoviesTable
+                movies={movies}
+                sortColumn={sortColumn}
+                onLike={this.handleLike}
+                onDelete={this.handleDelete}
+                onSort={this.handleSort}
+                user={user}
+              />
+              <Pagination
+                itemsCount={totalCount}
+                pageSize={pageSize}
+                currentPage={currentPage}
+                onPageChange={this.handlePageChange}
+              />
+            </div>
           )}
-          <p>Showing {totalCount} movies in the databse.</p>
-          <SearchBox value={searchQuery} onChange={this.handleSearch} />
-          <MoviesTable
-            movies={movies}
-            sortColumn={sortColumn}
-            onLike={this.handleLike}
-            onDelete={this.handleDelete}
-            onSort={this.handleSort}
-            user={user}
-          />
-          <Pagination
-            itemsCount={totalCount}
-            pageSize={pageSize}
-            currentPage={currentPage}
-            onPageChange={this.handlePageChange}
-          />
-        </div>
+        </AuthContextConsumer>
       </div>
     );
   }

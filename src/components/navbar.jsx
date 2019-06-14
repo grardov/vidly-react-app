@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
+import AuthContextConsumer from "./context/authContext";
 
 const Navbar = ({ user }) => {
   return (
@@ -29,26 +30,33 @@ const Navbar = ({ user }) => {
           <NavLink className="nav-link nav-item" to="/rentals">
             Rentals
           </NavLink>
-          {!user && (
-            <React.Fragment>
-              <NavLink className="nav-link nav-item" to="/login">
-                Login
-              </NavLink>
-              <NavLink className="nav-link nav-item" to="/register">
-                Register
-              </NavLink>
-            </React.Fragment>
-          )}
-          {user && (
-            <React.Fragment>
-              <NavLink className="nav-link nav-item" to="/profile">
-                {user.name}
-              </NavLink>
-              <NavLink className="nav-link nav-item" to="/logout">
-                Logout
-              </NavLink>
-            </React.Fragment>
-          )}
+          <AuthContextConsumer>
+            {({ user }) => {
+              if (!user) {
+                return (
+                  <React.Fragment>
+                    <NavLink className="nav-link nav-item" to="/login">
+                      Login
+                    </NavLink>
+                    <NavLink className="nav-link nav-item" to="/register">
+                      Register
+                    </NavLink>
+                  </React.Fragment>
+                );
+              } else {
+                return (
+                  <React.Fragment>
+                    <NavLink className="nav-link nav-item" to="/profile">
+                      {user.name}
+                    </NavLink>
+                    <NavLink className="nav-link nav-item" to="/logout">
+                      Logout
+                    </NavLink>
+                  </React.Fragment>
+                );
+              }
+            }}
+          </AuthContextConsumer>
         </div>
       </div>
     </nav>
